@@ -1,0 +1,328 @@
+openapi: 3.0.3
+info:
+  title:  Gateway server
+  version: 1.0.0
+servers:
+  - url: /api/v1/
+
+tags:
+  - name: gateway
+    description: Gateway API
+
+paths:
+  /gateways:
+    get:
+      tags:
+        - gateway
+      summary: Get list of gateways
+      responses:
+        "200":
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    serial:
+                      type: string
+                      description: Unique serial number
+                    name:
+                      type: string
+                  required:
+                    - serial
+                    - name
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden
+  /gateway:
+    get:
+      tags:
+        - gateway
+      summary: Get gateway data
+      parameters:
+        - in: query
+          name: serial
+          schema:
+            type: string
+          required: true
+          description: Unique serial number
+      responses:
+        "200":
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Gateway"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+    put:
+      tags:
+        - gateway
+      summary: Create or modify gateway
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Gateway"
+      responses:
+        "200":
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Unique serial number
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Unique serial number
+        "403":
+          description: Forbidden
+    delete:
+      tags:
+        - gateway
+      summary: Delete gateway
+      parameters:
+        - in: query
+          name: serial
+          schema:
+            type: string
+          required: true
+          description: Unique serial number
+      responses:
+        "200":
+          description: Successful
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden
+
+  /devices:
+    get:
+      tags:
+        - gateway
+      summary: Get list of devices
+      parameters:
+        - in: query
+          name: serial
+          schema:
+            type: string
+          required: false
+          description: Unique serial number of gateway if not set then show all devices
+      responses:
+        "200":
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uid:
+                    type: integer
+                  vendor:
+                    type: string
+                required:
+                  - uid
+                  - vendor
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+  /device:
+    get:
+      tags:
+        - gateway
+      summary: Get device data
+      parameters:
+        - in: query
+          name: uid
+          schema:
+            type: number
+          required: true
+      responses:
+        "200":
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Device"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+    put:
+      tags:
+        - gateway
+      summary: Create or modify device
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Device"
+      responses:
+        "200":
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: string
+                description: uid
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Unique serial number
+        "403":
+          description: Forbidden
+    delete:
+      tags:
+        - gateway
+      summary: Delete device
+      parameters:
+        - in: query
+          name: uid
+          schema:
+            type: number
+          required: true
+      responses:
+        "200":
+          description: Successful
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden
+  /bind:
+    post:
+      tags:
+        - gateway
+      summary: Bind devices to gateway
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serial:
+                  type: string
+                  description: Unique serial number of the gateway
+                devices:
+                  type: array
+                  items:
+                    type: number
+                    description: devices' uids
+      responses:
+        "200":
+          description:  Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bound:
+                    type: array
+                    items:
+                      type: number
+                    description: uid of devices that was successfully bounded
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    Gateway:
+      type: object
+      properties:
+        serial:
+          type: string
+          description: Unique serial number
+        name:
+          type: string
+        ip:
+          type: integer
+          description: IPv4 address, saved as int because this format takes less memory than string and it is simpler to work with number
+        devices:
+          type: array
+          items:
+            type: integer
+          description: uids of multiple associated peripheral devices
+      required:
+        - serial
+        - name
+        - ip
+        - devices
+    Device:
+      type: object
+      properties:
+        uid:
+          type: integer
+        vendor:
+          type: string
+        date_created:
+          type: number
+          description: Unix-time date
+        status:
+          type: string
+          enum:
+            - online
+            - offline
