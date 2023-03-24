@@ -250,6 +250,9 @@ paths:
                   items:
                     type: number
                     description: devices' uids
+              required:
+                - serial
+                - devices
       responses:
         "200":
           description:  Successful
@@ -263,6 +266,45 @@ paths:
                     items:
                       type: number
                     description: uid of devices that was successfully bounded
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /unbind:
+    post:
+      tags:
+        - gateway
+      summary: Unbind devices from gateway
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serial:
+                  type: string
+                  description: Unique serial number of the gateway
+                devices:
+                  type: array
+                  items:
+                    type: number
+                    description: devices' uids
+              required:
+                - serial
+                - devices
+      responses:
+        "200":
+          description: Successful
         "400":
           description: Bad request
           content:
