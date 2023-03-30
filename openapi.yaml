@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title:  Gateway server
+  title: Gateway server
   version: 1.0.0
 servers:
   - url: /api/v1/
@@ -16,7 +16,7 @@ paths:
         - gateway
       summary: Get list of gateways
       responses:
-        "200":
+        '200':
           description: Successful
           content:
             application/json:
@@ -33,13 +33,13 @@ paths:
                   required:
                     - serial
                     - name
-        "400":
+        '400':
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-        "403":
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
   /gateway:
     get:
@@ -54,21 +54,21 @@ paths:
           required: true
           description: Unique serial number
       responses:
-        "200":
+        '200':
           description: Successful
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Gateway"
-        "400":
+                $ref: '#/components/schemas/Gateway'
+        '400':
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-        "403":
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
-        "404":
+        '404':
           description: Not found
     put:
       tags:
@@ -78,24 +78,42 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Gateway"
+              $ref: '#/components/schemas/Gateway'
       responses:
-        "200":
+        '200':
           description: Successful
           content:
             application/json:
               schema:
-                type: string
-                description: Unique serial number
-        "201":
+                type: object
+                properties:
+                  serial:
+                    type: string
+                    description: Unique serial number
+                required:
+                  - serial
+        '201':
           description: Created
           content:
             application/json:
               schema:
-                type: string
-                description: Unique serial number
-        "403":
+                type: object
+                properties:
+                  serial:
+                    type: string
+                    description: Unique serial number
+                required:
+                  - serial
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
+        '404':
+          description: Not found
     delete:
       tags:
         - gateway
@@ -108,15 +126,15 @@ paths:
           required: true
           description: Unique serial number
       responses:
-        "200":
+        '200':
           description: Successful
-        "400":
+        '400':
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-        "403":
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
 
   /devices:
@@ -132,29 +150,31 @@ paths:
           required: false
           description: Unique serial number of gateway if not set then show all devices
       responses:
-        "200":
+        '200':
           description: Successful
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  uid:
-                    type: integer
-                  vendor:
-                    type: string
-                required:
-                  - uid
-                  - vendor
-        "400":
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uid:
+                      type: integer
+                    vendor:
+                      type: string
+                  required:
+                    - uid
+                    - vendor
+        '400':
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-        "403":
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
-        "404":
+        '404':
           description: Not found
   /device:
     get:
@@ -168,21 +188,21 @@ paths:
             type: number
           required: true
       responses:
-        "200":
+        '200':
           description: Successful
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Device"
-        "400":
+                $ref: '#/components/schemas/Device'
+        '400':
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-        "403":
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
-        "404":
+        '404':
           description: Not found
     put:
       tags:
@@ -192,24 +212,42 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Device"
+              $ref: '#/components/schemas/Device'
       responses:
-        "200":
+        '200':
           description: Successful
           content:
             application/json:
               schema:
-                type: string
-                description: uid
-        "201":
+                type: object
+                properties:
+                  uid:
+                    type: number
+                    description: uid
+                required:
+                  - uid
+        '201':
           description: Created
           content:
             application/json:
               schema:
-                type: string
-                description: Unique serial number
-        "403":
+                type: object
+                properties:
+                  uid:
+                    type: number
+                    description: uid
+                required:
+                  - uid
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
+        '404':
+          description: Not found
     delete:
       tags:
         - gateway
@@ -221,15 +259,15 @@ paths:
             type: number
           required: true
       responses:
-        "200":
+        '200':
           description: Successful
-        "400":
+        '400':
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-        "403":
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
   /bind:
     post:
@@ -254,8 +292,8 @@ paths:
                 - serial
                 - devices
       responses:
-        "200":
-          description:  Successful
+        '200':
+          description: Successful
           content:
             application/json:
               schema:
@@ -266,20 +304,20 @@ paths:
                     items:
                       type: number
                     description: uid of devices that was successfully bounded
-        "400":
+        '400':
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-        "403":
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
-        "404":
+        '404':
           description: Not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /unbind:
     post:
       tags:
@@ -303,22 +341,22 @@ paths:
                 - serial
                 - devices
       responses:
-        "200":
+        '200':
           description: Successful
-        "400":
+        '400':
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-        "403":
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
-        "404":
+        '404':
           description: Not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
 
 components:
   schemas:

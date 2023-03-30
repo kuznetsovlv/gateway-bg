@@ -2,8 +2,13 @@
   "name": "gateway-bg",
   "version": "1.0.0",
   "description": "Back-end of gateway project, test task",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "private": true,
   "scripts": {
+    "dev": "webpack --mode development",
+    "build": "webpack --mode production",
+    "prettier": "prettier --config .prettierrc --write .",
+    "lint": "eslint -c .eslintrc.json --ext .js src/ --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +20,19 @@
   "bugs": {
     "url": "https://github.com/kuznetsovlv/gateway-bg/issues"
   },
-  "homepage": "https://github.com/kuznetsovlv/gateway-bg#readme"
+  "homepage": "https://github.com/kuznetsovlv/gateway-bg#readme",
+  "devDependencies": {
+    "clean-webpack-plugin": "^4.0.0",
+    "eslint": "^8.36.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-config-silence": "^2.0.0",
+    "eslint-plugin-jest": "^27.2.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.7",
+    "webpack": "^5.76.3",
+    "webpack-cli": "^5.0.1"
+  },
+  "dependencies": {
+    "gateway-bg-interface": "^1.0.2"
+  }
 }

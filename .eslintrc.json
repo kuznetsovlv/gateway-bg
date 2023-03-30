@@ -1,0 +1,30 @@
+{
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:prettier/recommended",
+    "eslint-config-silence"
+  ],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": ["error"],
+    "no-case-declarations": ["off"],
+    "eqeqeq": ["warn"],
+    "sonarjs/no-small-switch": ["off"],
+    "sonarjs/max-switch-cases": ["off"],
+    "sonarjs/cognitive-complexity": ["warn"],
+    "init-declarations": ["off"],
+    "no-bitwise": ["off"],
+    "no-extra-boolean-cast": ["off"],
+    "no-multi-assign": ["off"],
+    "unicorn/consistent-function-scoping": ["off"], // Switched off because of incorrect works
+    "unicorn/no-unsafe-regex": ["off"],
+    "unicorn/number-literal-case": ["off"],
+    "unicorn/prefer-string-slice": ["off"],
+    "unicorn/prefer-query-selector": ["off"],
+    "no-return-assign": ["off"]
+  }
+}
