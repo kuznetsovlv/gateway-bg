@@ -1,16 +1,20 @@
 import { getInterface } from 'gateway-bg-interface';
 import { v4 } from 'uuid';
 
-const MAX_DEVICES_PER_GATEWAY = 10;
+import { uidCreator } from './utils';
+
+const MAX_DEVICES_PER_gateway = 10;
+
+const getUid = uidCreator();
 
 /**
- * @typedef {Object} SimpleGateway
+ * @typedef {Object} Simplegateway
  * @property {string} serial
  * @property {string} name
  */
 
 /**
- * @typedef {Object} Gateway
+ * @typedef {Object} gateway
  * @property {string} serial
  * @property {string} name
  * @property {number} ip
@@ -18,14 +22,14 @@ const MAX_DEVICES_PER_GATEWAY = 10;
  */
 
 /**
- * @typedef {Object} GatewayStorage
+ * @typedef {Object} gatewayStorage
  * @property {string} serial
  * @property {string} name
  * @property {number} ip
  */
 
 /**
- * @typedef {Object} OptionalGateway
+ * @typedef {Object} Optionalgateway
  * @property {string} [serial]
  * @property {string} [name]
  * @property {number} [ip]
@@ -54,86 +58,104 @@ const MAX_DEVICES_PER_GATEWAY = 10;
  * @typedef {Object} OptionalDevice
  * @property {string} [uid]
  * @property {string} [vendor]
- * @property {number} [dateCreated]
  * @property {Status} [status]
  */
 
 class Bounds {
   /**
+   * @private
    * @type {Map<string, Set<number>>}
    */
   $gateways = new Map();
   /**
+   * @private
    * @type {Map<number, Set<string>>}
    */
   $devices = new Map();
 
   /**
-   * @param {string} gateWay
+   * @param {string} gateway
    * @param {number} device
    */
-  bind({ gateWay, device }) {
-    if (!this.$gateways.has(gateWay)) {
-      this.$gateways.set(gateWay, new Set());
+  bind({ gateway, device }) {
+    if (!this.$gateways.has(gateway)) {
+      this.$gateways.set(gateway, new Set());
     }
 
-    if (this.$gateways.get(gateWay).size >= MAX_DEVICES_PER_GATEWAY) {
+    if (this.$gateways.get(gateway).size >= MAX_DEVICES_PER_gateway) {
       throw new Error('Maximum device count exceeded');
     }
 
-    this.$gateways.get(gateWay).add(device);
+    this.$gateways.get(gateway).add(device);
 
     if (!this.$devices.has(device)) {
       this.$devices.set(device, new Set());
     }
 
-    this.$devices.get(device).add(gateWay);
+    this.$devices.get(device).add(gateway);
   }
 
   /**
-   * @param {string} gateWay
+   * @param {string} gateway
    * @param {number} device
    */
-  unbind({ gateWay, device }) {
-    if (!this.$gateways.has(gateWay) || !this.$devices.has(device)) {
+  unbind({ gateway, device }) {
+    if (!this.$gateways.has(gateway) || !this.$devices.has(device)) {
       return;
     }
 
-    this.$gateways.get(gateWay).delete(device);
-    this.$devices.get(device).delete(gateWay);
+    this.$gateways.get(gateway).delete(device);
+    this.$devices.get(device).delete(gateway);
   }
 
   /**
    * Returns list of bound devices
-   * @param gateway
-   * @return number[]
+   * @param {string} gateway
+   * @return {number[]}
    */
   getDevices(gateway) {
     return this.$gateways.has(gateway)
       ? Array.from(this.$gateways.get(gateway))
       : [];
   }
+
+  /**
+   * Returns list of bound gateways
+   * @param {number} device
+   * @return {string[]}
+   */
+  getgateways(device) {
+    return this.$gateways.has(device)
+      ? Array.from(this.$gateways.get(device))
+      : [];
+  }
 }
 
 export class Data {
   /**
-   * @type {Map<string, GatewayStorage>}
+   * @private
+   * @type {Map<string, gatewayStorage>}
    */
   $gateways = new Map();
 
   /**
+   * @private
    * @type {Map<number, Device>}
    */
   $devices = new Map();
 
+  /**
+   * @private
+   * @type {Bounds}
+   */
   $bounds = new Bounds();
 
   /**
    * @public
    * Returns list of available gateways
-   * @return {SimpleGateway[]}
+   * @return {Simplegateway[]}
    */
-  getGateWays() {
+  getgateways() {
     return Array.from(this.$gateways.values()).map(({ serial, name }) => ({
       serial,
       name
@@ -144,9 +166,9 @@ export class Data {
    * @public
    * Returns information about gateway
    * @param {string} serial - gateway's unique serial number
-   * @return {Gateway|null}
+   * @return {gateway|null}
    */
-  getGateWay(serial) {
+  getgateway(serial) {
     if (!this.$gateways.has(serial)) {
       return null;
     }
@@ -160,17 +182,15 @@ export class Data {
   /**
    * @public
    * Modifies or creates new gateway
-   * @param {OptionalGateway} gateway
+   * @param {Optionalgateway}
    * @return {{serial: string}}
    */
-  putGateway(gateway) {
-    const { serial: currentSerial, devices, ...rest } = gateway;
-
+  putgateway({ serial: currentSerial, devices, ...rest }) {
     if (!currentSerial || !this.$gateways.has(currentSerial)) {
       const { name, ip } = rest;
 
       if (!name || typeof name !== 'string') {
-        throw new Error("Gateway's name not set");
+        throw new Error("gateway's name not set");
       }
       if (!Number.isInteger(ip) || isNaN(ip) || ~~ip !== ip) {
         throw new Error('Invalid IP');
@@ -182,7 +202,7 @@ export class Data {
 
       if (Array.isArray(devices)) {
         devices.forEach(device =>
-          this.$bounds.bind({ gateWay: serial, device })
+          this.$bounds.bind({ gateway: serial, device })
         );
       }
 
@@ -198,10 +218,10 @@ export class Data {
       this.$bounds
         .getDevices(currentSerial)
         .forEach(device =>
-          this.$bounds.unbind({ gateWay: currentSerial, device })
+          this.$bounds.unbind({ gateway: currentSerial, device })
         );
       devices.forEach(device =>
-        this.$bounds.bind({ gateWay: currentSerial, device })
+        this.$bounds.bind({ gateway: currentSerial, device })
       );
     }
 
@@ -213,12 +233,84 @@ export class Data {
    * Deletes gateway
    * @param {string} serial - gateway's unique serial number
    */
-  deleteGateway(serial) {
+  deletegateway(serial) {
     if (this.$gateways.has(serial)) {
       this.$bounds
         .getDevices(serial)
-        .forEach(device => this.$bounds.unbind({ gateWay: serial, device }));
+        .forEach(device => this.$bounds.unbind({ gateway: serial, device }));
       this.$gateways.delete(serial);
+    }
+  }
+
+  /**
+   * @public
+   * Returns list of available devices
+   * @param {string} [serial] - unique gateway's serial number, should return all devices
+   * @return {SimpleDevice[]|null}
+   */
+  getDevices(serial) {
+    if (!serial) {
+      return Array.from(this.$devices).map(({ uid, vendor }) => ({
+        uid,
+        vendor
+      }));
+    }
+
+    if (!this.$gateways.has(serial)) {
+      return null;
+    }
+
+    const result = [];
+
+    for (const device of this.$bounds.getDevices(serial)) {
+      if (this.$devices.has(device)) {
+        const { uid, vendor } = this.$devices.get(device);
+        result.push({ uid, vendor });
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * @public
+   * Modifies or creates new device
+   * @param {OptionalDevice}
+   * @return {{uid: number}}
+   */
+  putDevice({ uid, ...rest }) {
+    if (!uid || !this.$devices.has(uid)) {
+      const { vendor, status } = rest;
+
+      if (!vendor || typeof vendor !== 'string') {
+        throw new Error('Vendor not set');
+      }
+
+      if (!status || typeof status !== 'string') {
+        throw new Error('Status not set');
+      }
+
+      uid = uid || getUid();
+
+      this.$devices.set(uid, { uid, date_created: Date.now(), status, vendor });
+    } else {
+      this.$devices.set(uid, { ...this.$devices.get(uid), ...rest });
+    }
+
+    return { uid };
+  }
+
+  /**
+   * @public
+   * Deletes device
+   * @param {number} uid - gateway's unique serial number
+   */
+  deleteDevice(uid) {
+    if (this.$devices.has(uid)) {
+      this.$bounds
+        .getgateways(uid)
+        .forEach(gateway => this.$bounds.unbind({ gateway, device: uid }));
+      this.$devices.delete(uid);
     }
   }
 }
@@ -236,30 +328,30 @@ export default class DataProvider extends getInterface() {
   /**
    * @public
    * Returns list of available gateways
-   * @return {SimpleGateway[]}
+   * @return {Simplegateway[]}
    */
-  getGateways() {
-    return this.$data.getGateWays();
+  getgateways() {
+    return this.$data.getgateways();
   }
 
   /**
    * @public
    * Returns information about gateway
    * @param {string} serial - gateway's unique serial number
-   * @return {Gateway|null}
+   * @return {gateway|null}
    */
-  getGateway(serial) {
-    return this.$data.getGateWay(serial);
+  getgateway(serial) {
+    return this.$data.getgateway(serial);
   }
 
   /**
    * @public
    * Modifies or creates new gateway
-   * @param {OptionalGateway} gateway
+   * @param {Optionalgateway} gateway
    * @return {{serial: string}}
    */
-  putGateway(gateway) {
-    return this.$data.putGateway(gateway);
+  putgateway(gateway) {
+    return this.$data.putgateway(gateway);
   }
 
   /**
@@ -267,7 +359,36 @@ export default class DataProvider extends getInterface() {
    * Deletes gateway
    * @param {string} serial - gateway's unique serial number
    */
-  deleteGateway(serial) {
-    this.$data.deleteGateway(serial);
+  deletegateway(serial) {
+    this.$data.deletegateway(serial);
+  }
+
+  /**
+   * @public
+   * Returns list of available devices
+   * @param {string} [serial] - unique gateway's serial number, should return all devices
+   * @return {SimpleDevice[]|null}
+   */
+  getDevices(serial) {
+    return this.$data.getDevices(serial);
+  }
+
+  /**
+   * @public
+   * Modifies or creates new device
+   * @param {OptionalDevice} device
+   * @return {{uid: number}}
+   */
+  putDevice(device) {
+    return this.$data.putDevice(device);
+  }
+
+  /**
+   * @public
+   * Deletes device
+   * @param {number} uid - gateway's unique serial number
+   */
+  deleteDevice(uid) {
+    this.$data.deleteDevice(uid);
   }
 }

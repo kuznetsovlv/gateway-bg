@@ -25,6 +25,7 @@
     "unicorn/number-literal-case": ["off"],
     "unicorn/prefer-string-slice": ["off"],
     "unicorn/prefer-query-selector": ["off"],
-    "no-return-assign": ["off"]
+    "no-return-assign": ["off"],
+    "no-param-reassign": ["off"]
   }
 }

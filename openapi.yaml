@@ -1,13 +1,13 @@
 openapi: 3.0.3
 info:
-  title: Gateway server
+  title: gateway server
   version: 1.0.0
 servers:
   - url: /api/v1/
 
 tags:
   - name: gateway
-    description: Gateway API
+    description: gateway API
 
 paths:
   /gateways:
@@ -59,7 +59,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Gateway'
+                $ref: '#/components/schemas/gateway'
         '400':
           description: Bad request
           content:
@@ -78,7 +78,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Gateway'
+              $ref: '#/components/schemas/gateway'
       responses:
         '200':
           description: Successful
@@ -370,7 +370,7 @@ components:
           type: string
         message:
           type: string
-    Gateway:
+    gateway:
       type: object
       properties:
         serial:
