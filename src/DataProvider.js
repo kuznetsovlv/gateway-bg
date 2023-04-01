@@ -124,7 +124,7 @@ class Bounds {
    * @param {number} device
    * @return {string[]}
    */
-  getgateways(device) {
+  getGateways(device) {
     return this.$gateways.has(device)
       ? Array.from(this.$gateways.get(device))
       : [];
@@ -155,7 +155,7 @@ export class Data {
    * Returns list of available gateways
    * @return {Simplegateway[]}
    */
-  getgateways() {
+  getGateways() {
     return Array.from(this.$gateways.values()).map(({ serial, name }) => ({
       serial,
       name
@@ -168,7 +168,7 @@ export class Data {
    * @param {string} serial - gateway's unique serial number
    * @return {gateway|null}
    */
-  getgateway(serial) {
+  getGateway(serial) {
     if (!this.$gateways.has(serial)) {
       return null;
     }
@@ -185,7 +185,7 @@ export class Data {
    * @param {Optionalgateway}
    * @return {{serial: string}}
    */
-  putgateway({ serial: currentSerial, devices, ...rest }) {
+  putGateway({ serial: currentSerial, devices, ...rest }) {
     if (!currentSerial || !this.$gateways.has(currentSerial)) {
       const { name, ip } = rest;
 
@@ -233,7 +233,7 @@ export class Data {
    * Deletes gateway
    * @param {string} serial - gateway's unique serial number
    */
-  deletegateway(serial) {
+  deleteGateway(serial) {
     if (this.$gateways.has(serial)) {
       this.$bounds
         .getDevices(serial)
@@ -308,7 +308,7 @@ export class Data {
   deleteDevice(uid) {
     if (this.$devices.has(uid)) {
       this.$bounds
-        .getgateways(uid)
+        .getGateways(uid)
         .forEach(gateway => this.$bounds.unbind({ gateway, device: uid }));
       this.$devices.delete(uid);
     }
@@ -330,8 +330,8 @@ export default class DataProvider extends getInterface() {
    * Returns list of available gateways
    * @return {Simplegateway[]}
    */
-  getgateways() {
-    return this.$data.getgateways();
+  getGateways() {
+    return this.$data.getGateways();
   }
 
   /**
@@ -340,8 +340,8 @@ export default class DataProvider extends getInterface() {
    * @param {string} serial - gateway's unique serial number
    * @return {gateway|null}
    */
-  getgateway(serial) {
-    return this.$data.getgateway(serial);
+  getGateway(serial) {
+    return this.$data.getGateway(serial);
   }
 
   /**
@@ -350,8 +350,8 @@ export default class DataProvider extends getInterface() {
    * @param {Optionalgateway} gateway
    * @return {{serial: string}}
    */
-  putgateway(gateway) {
-    return this.$data.putgateway(gateway);
+  putGateway(gateway) {
+    return this.$data.putGateway(gateway);
   }
 
   /**
@@ -359,8 +359,8 @@ export default class DataProvider extends getInterface() {
    * Deletes gateway
    * @param {string} serial - gateway's unique serial number
    */
-  deletegateway(serial) {
-    this.$data.deletegateway(serial);
+  deleteGateway(serial) {
+    this.$data.deleteGateway(serial);
   }
 
   /**
