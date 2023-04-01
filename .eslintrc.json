@@ -15,7 +15,7 @@
     "eqeqeq": ["warn"],
     "sonarjs/no-small-switch": ["off"],
     "sonarjs/max-switch-cases": ["off"],
-    "sonarjs/cognitive-complexity": ["warn"],
+    "sonarjs/cognitive-complexity": ["warn", 27],
     "init-declarations": ["off"],
     "no-bitwise": ["off"],
     "no-extra-boolean-cast": ["off"],

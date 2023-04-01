@@ -185,8 +185,16 @@ export class Data {
    * @param {Optionalgateway}
    * @return {{serial: string}}
    */
-  putGateway({ serial: currentSerial, devices, ...rest }) {
-    if (!currentSerial || !this.$gateways.has(currentSerial)) {
+  putGateway({ serial, devices, ...rest }) {
+    if (Array.isArray(devices)) {
+      for (const device of devices) {
+        if (!Number.isInteger(device) || !this.$devices.has(device)) {
+          throw new Error(`Wrong device uid: ${device}`);
+        }
+      }
+    }
+
+    if (!serial || !this.$gateways.has(serial)) {
       const { name, ip } = rest;
 
       if (!name || typeof name !== 'string') {
@@ -196,7 +204,7 @@ export class Data {
         throw new Error('Invalid IP');
       }
 
-      const serial = currentSerial || v4();
+      serial = serial || v4();
 
       this.$gateways.set(serial, { serial, name, ip });
 
@@ -205,27 +213,23 @@ export class Data {
           this.$bounds.bind({ gateway: serial, device })
         );
       }
+    } else {
+      this.$gateways.set(serial, {
+        ...this.$gateways.get(serial),
+        ...rest
+      });
 
-      return { serial };
-    }
-
-    this.$gateways.set(currentSerial, {
-      ...this.$gateways.get(currentSerial),
-      ...rest
-    });
-
-    if (Array.isArray(devices)) {
-      this.$bounds
-        .getDevices(currentSerial)
-        .forEach(device =>
-          this.$bounds.unbind({ gateway: currentSerial, device })
+      if (Array.isArray(devices)) {
+        this.$bounds
+          .getDevices(serial)
+          .forEach(device => this.$bounds.unbind({ gateway: serial, device }));
+        devices.forEach(device =>
+          this.$bounds.bind({ gateway: serial, device })
         );
-      devices.forEach(device =>
-        this.$bounds.bind({ gateway: currentSerial, device })
-      );
+      }
     }
 
-    return { serial: currentSerial };
+    return { serial };
   }
 
   /**
