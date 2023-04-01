@@ -78,6 +78,9 @@ class Bounds {
    * @param {number} device
    */
   bind({ gateway, device }) {
+    if (!device || !Number.isInteger(device)) {
+      throw new Error(`Wrong device uid '${device}'`);
+    }
     if (!this.$gateways.has(gateway)) {
       this.$gateways.set(gateway, new Set());
     }
@@ -100,6 +103,10 @@ class Bounds {
    * @param {number} device
    */
   unbind({ gateway, device }) {
+    if (!device || !Number.isInteger(device)) {
+      throw new Error(`Wrong device uid '${device}'`);
+    }
+
     if (!this.$gateways.has(gateway) || !this.$devices.has(device)) {
       return;
     }
@@ -317,6 +324,46 @@ export class Data {
       this.$devices.delete(uid);
     }
   }
+
+  /**
+   * @public
+   * Binds devices to gateway
+   * @param {string} serial - gateway's unique serial number
+   * @param {number[]} devices - list of devices' uids
+   * @return {{bound: number[]}} - list of successfully bound devices' uids
+   */
+  bind(serial, devices) {
+    if (!this.$gateways.has(serial)) {
+      throw new Error(`Gateway ${serial} does not exist.`);
+    }
+
+    const success = [];
+
+    for (const device of devices) {
+      try {
+        this.$bounds.bind({ gateway: serial, device });
+        success.push(device);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    return { bound: success };
+  }
+
+  /**
+   * @public
+   * Unbinds devices to gateway
+   * @param {string} serial - gateway's unique serial number
+   * @param {number[]} devices - list of devices' uids
+   */
+  unbind(serial, devices) {
+    if (!this.$gateways.has(serial)) {
+      throw new Error(`Gateway ${serial} does not exist.`);
+    }
+
+    devices.forEach(device => this.$bounds.unbind({ gateway: serial, device }));
+  }
 }
 
 export default class DataProvider extends getInterface() {
@@ -394,5 +441,26 @@ export default class DataProvider extends getInterface() {
    */
   deleteDevice(uid) {
     this.$data.deleteDevice(uid);
+  }
+
+  /**
+   * @public
+   * Binds devices to gateway
+   * @param {string} serial - gateway's unique serial number
+   * @param {number[]} devices - list of devices' uids
+   * @return {{bound: number[]}} - list of successfully bound devices' uids
+   */
+  bind(serial, devices) {
+    return this.$data.bind(serial, devices);
+  }
+
+  /**
+   * @public
+   * Unbinds devices to gateway
+   * @param {string} serial - gateway's unique serial number
+   * @param {number[]} devices - list of devices' uids
+   */
+  unbind(serial, devices) {
+    this.$data.unbind(serial, devices);
   }
 }
