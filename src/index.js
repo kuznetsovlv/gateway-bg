@@ -1,5 +1,6 @@
 import Server from 'gateway-bg-interface';
-import DataProvider, { Data } from './DataProvider';
+import Data from './Data';
+import DataProvider from './DataProvider';
 
 const MAX_PORT_VALUE = 65535;
 
