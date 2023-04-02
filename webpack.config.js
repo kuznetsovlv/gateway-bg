@@ -8,10 +8,6 @@ module.exports = {
     filename: 'index.js',
     path: resolve(__dirname, 'dist')
   },
-  // resolve: {
-  //   extensions: ['.js'],
-  //   alias: { '/': resolve(__dirname, 'src') }
-  // },
   optimization: {
     splitChunks: { chunks: 'all' }
   },
