@@ -211,7 +211,7 @@ export default class Data {
    */
   getDevices(serial) {
     if (!serial) {
-      return Array.from(this.$devices).map(({ uid, vendor }) => ({
+      return Array.from(this.$devices.values()).map(({ uid, vendor }) => ({
         uid,
         vendor
       }));
@@ -234,6 +234,18 @@ export default class Data {
   }
 
   /**
+   *  @public
+   * @param  {number} uid
+   * @return {Device|null}
+   */
+  getDevice(uid) {
+    if (this.$devices.has(uid)) {
+      return this.$devices.get(uid);
+    }
+    return null;
+  }
+
+  /**
    * @public
    * Modifies or creates new device
    * @param {OptionalDevice}
@@ -253,7 +265,12 @@ export default class Data {
 
       uid = uid || getUid();
 
-      this.$devices.set(uid, { uid, date_created: Date.now(), status, vendor });
+      this.$devices.set(uid, {
+        uid,
+        date_created: Math.floor(Date.now() / 1000),
+        status,
+        vendor
+      });
     } else {
       this.$devices.set(uid, { ...this.$devices.get(uid), ...rest });
     }

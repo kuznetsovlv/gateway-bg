@@ -63,6 +63,15 @@ export default class DataProvider extends getInterface() {
 
   /**
    * @public
+   * @param {number} uid
+   * @return {Device|null}
+   */
+  getDevice(uid) {
+    return this.$data.getDevice(uid);
+  }
+
+  /**
+   * @public
    * Modifies or creates new device
    * @param {OptionalDevice} device
    * @return {{uid: number}}
